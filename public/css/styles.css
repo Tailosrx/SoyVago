@@ -524,10 +524,25 @@ aside:not(:has(:checked))
   z-index: 1;
 }
 
-.streak-card .fecha-limite {
+.fecha-container {
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fecha-limite {
+  font-size: 0.9em;
   color: #e67e22;
   font-weight: bold;
+  margin: 0;
 }
+
+.vencido {
+  color: #e74c3c;
+  font-size: 0.8em;
+}
+
 
 /* Barra de progreso */
 .streak-progress {
@@ -769,6 +784,16 @@ ul {
   grid-column: 1 / -1;
 }
 
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+
 .btn-ver, .btn-editar {
   display: inline-flex;
   align-items: center;
@@ -811,14 +836,13 @@ ul {
   height: 16px;
 }
 
-
-
-
 .meta-acciones {
   display: flex;
-  justify-content: flex-start;
   gap: 10px;
-  margin-top: 15px;
+}
+
+.delete-form {
+  margin-left: auto;
 }
 
 
@@ -841,3 +865,4 @@ ul {
   width: 16px;
   height: 16px;
 }
+

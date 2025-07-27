@@ -207,45 +207,49 @@ $metas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php endif; ?>
                             
                             <div class="streak-progress">
-                                <div class="progress-bar" style="width: <?= min(100, ($meta['racha'] ?? 0) * 10) ?>%"></div>
-                            </div>
-                            <p>Racha: <?= $meta['racha'] ?? 0 ?> días</p>
+        <div class="progress-bar" style="width: <?= min(100, ($meta['racha'] ?? 0) * 10) ?>%"></div>
+    </div>
+    <p>Racha: <?= $meta['racha'] ?? 0 ?> días</p>
+    
+    <?php if ($meta['fecha_limite']): ?>
+        <div class="fecha-container">
+            <p class="fecha-limite">📅 <?= date('d/m/Y', strtotime($meta['fecha_limite'])) ?></p>
+            <?php 
+            $hoy = new DateTime();
+            $fecha_lim = new DateTime($meta['fecha_limite']);
+            if ($fecha_lim < $hoy && !$meta['completado']) {
+                echo '<span class="vencido">(Vencido)</span>';
+            }
+            ?>
+        </div>
+    <?php endif; ?>
                             
-                            <?php if ($meta['fecha_limite']): ?>
-                                <p class="fecha-limite">📅 <?= date('d/m/Y', strtotime($meta['fecha_limite'])) ?></p>
-                                <?php 
-                                $hoy = new DateTime();
-                                $fecha_lim = new DateTime($meta['fecha_limite']);
-                                if ($fecha_lim < $hoy && !$meta['completado']) {
-                                    echo '<span class="vencido">(Vencido)</span>';
-                                }
-                                ?>
-                            <?php endif; ?>
-                            
-                            <div class="meta-acciones">
-                             <a href="ver_meta.php?id=<?= $meta['id'] ?>" class="btn-ver">
-                             <svg class="icon-ver" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                             <path d="M12 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5 5 5 0 0 1 5-5 5 5 0 0 1 5 5 5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5z"/>
-                            </svg>
-                          Ver detalles
-                             </a>
-                          <a href="editar_meta.php?id=<?= $meta['id'] ?>" class="btn-editar">
-                          <svg class="icon-editar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                          </svg>
-                            </a>
-                             </div>
-                            
-                            <form method="POST" action="procesar_meta.php" class="delete-form">
-                                <input type="hidden" name="meta_id" value="<?= $meta['id'] ?>">
-                                <input type="hidden" name="accion" value="eliminar">
-                                <button type="submit" class="delete-btn" onclick="">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
+    <div class="card-footer">
+        <div class="meta-acciones">
+            <a href="ver_meta.php?id=<?= $meta['id'] ?>" class="btn-ver">
+                <svg class="icon-ver" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M12 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5 5 5 0 0 1 5-5 5 5 0 0 1 5 5 5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5z"/>
+                </svg>
+                Ver detalles
+            </a>
+            <a href="editar_meta.php?id=<?= $meta['id'] ?>" class="btn-editar">
+                <svg class="icon-editar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                </svg>
+            </a>
+        </div>
+        
+        <form method="POST" action="procesar_meta.php" class="delete-form">
+            <input type="hidden" name="meta_id" value="<?= $meta['id'] ?>">
+            <input type="hidden" name="accion" value="eliminar">
+            <button type="submit" class="delete-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+            </button>
+        </form>
+    </div>
+</div>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
