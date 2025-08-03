@@ -9,7 +9,7 @@
 
 
 
-body{
+body.modo-oscuro{
   background-color: #171717;
   background-size: 30px 30px;
   background-position: -5px -5px;
@@ -17,11 +17,27 @@ body{
   box-sizing: border-box;
 }
 
-h2 {
+body.modo-diurno{
+  background-color: #f3ecec;
+  background-size: 30px 30px;
+  background-position: -5px -5px;
+  font-family: 'Ubuntu';
+  box-sizing: border-box;
+}
+
+body.modo-oscuro h2 {
   color: #f3ecec;
   margin-top: 10px;
   margin-bottom: 0;
 }
+
+body.modo-diurno h2 {
+  color: #171717;
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+
 
 h4 {
   font-size: 1em;
@@ -391,12 +407,12 @@ aside:not(:has(:checked))
   width: 100%;
 }
 
-.streak-card {
+.streak-card, .streak-card-extended {
   background: var(--card-color) !important;
 }
 
 
-.streak-card {
+.streak-card  {
   position: relative;
   background: var(--card-color);
   color: #c2e9fb;
@@ -407,6 +423,20 @@ aside:not(:has(:checked))
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: visible; 
+}
+
+.streak-card-extended {
+  position: relative;
+  background: var(--card-color);
+  color: #c2e9fb;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 120%;
   overflow: visible; 
 }
 
@@ -441,25 +471,28 @@ aside:not(:has(:checked))
 
 
 /* Efecto hover para mostrar texto completo */
-.streak-card:hover .importancia-indicador {
+.streak-card:hover .importancia-indicador, .streak-card-extended:hover .importancia-indicador {
   height: 10px;
 }
 
 /* Texto específico para cada importancia */
-.streak-card[data-importancia="3"] .importancia-indicador h5 {
+.streak-card[data-importancia="3"] .importancia-indicador h5, 
+.streak-card-extended[data-importancia="3"] .importancia-indicador h5 {
   background: linear-gradient(90deg, #ff4757, #e84118);
 }
 
-.streak-card[data-importancia="2"] .importancia-indicador h5 {
+.streak-card[data-importancia="2"] .importancia-indicador h5,
+.streak-card-extended[data-importancia="2"] .importancia-indicador h5 {
   background: linear-gradient(90deg, #ffa502, #e67e22);
 }
 
-.streak-card[data-importancia="1"] .importancia-indicador h5 {
+.streak-card[data-importancia="1"] .importancia-indicador h5,
+.streak-card-extended[data-importancia="1"] .importancia-indicador h5 {
   background-color: #2ed573;
 }
 
 /* Asegurar que la carta tenga posición relativa */
-.streak-card {
+.streak-card, .streak-card-extended {
   position: relative;
   padding-top: 10px; /* Espacio para el indicador */
   overflow: hidden; /* Para contener el indicador */
@@ -468,17 +501,9 @@ aside:not(:has(:checked))
 
 
 
-
-
-
-
-
-
-
 .delete-form {
-  margin-top: auto; /* Empuja el botón hacia abajo */
-  display: flex;
-  justify-content: flex-end; /* Alinea el botón a la derecha */
+  margin-left: auto;
+  position: static; /* Elimina el posicionamiento absoluto anterior */
 }
 
 .delete-btn {
@@ -492,6 +517,7 @@ aside:not(:has(:checked))
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin-left: 10px;
 }
 
 
@@ -503,23 +529,23 @@ aside:not(:has(:checked))
 }
 
 
-.streak-card:hover {
+.streak-card:hover, .streak-card-extended:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-.streak-card.completada {
+.streak-card.completada, .streak-card-extended.completada {
   --card-accent: rgba(255,255,255,0.3);
   opacity: 0.9;
 }
 
 /* Estilos para texto legible sobre colores */
-.streak-card h3 {
+.streak-card h3, .streak-card-extended h3 {
   position: relative;
   z-index: 1;
 }
 
-.streak-card p {
+.streak-card p, .streak-card-extended p {
   position: relative;
   z-index: 1;
 }
@@ -560,7 +586,7 @@ aside:not(:has(:checked))
   transition: width 0.5s ease;
 }
 
-.streak-card.completada .progress-bar {
+.streak-card.completada .progress-bar, .streak-card-extended.completada .progress-bar {
   background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
 }
 
@@ -696,85 +722,136 @@ ul {
 
 /*mis_metas.php*/
 .filtros-container {
-  background: #f8f9fa;
+  background: #2a2a2a;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   margin-bottom: 30px;
+  border: 1px solid #3a3a3a;
 }
 
 .filtros-title {
   margin-top: 0;
-  color: #343a40;
-  border-bottom: 2px solid #dee2e6;
+  color: #f3ecec;
+  border-bottom: 1px solid #634b4b;
   padding-bottom: 10px;
+  font-size: 1.2rem;
 }
 
-.filtro-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  align-items: end;
-}
 
-.filtro-grupo {
-  margin-bottom: 0;
+
+
+
+  .filtro-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+  }
+
+  .filtro-grupo {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 180px;
+  }
+
+.filtro-grupo:has(.btn-filtrar),
+.filtro-grupo:has(.btn-limpiar) {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 10px;
 }
 
 .filtro-grupo label {
   display: block;
   margin-bottom: 5px;
-  font-weight: 600;
-  color: #495057;
+  font-weight: 500;
+  color: #c47d7f;
+  font-size: 0.9rem;
 }
 
 .filtro-grupo select, 
 .filtro-grupo input {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  background-color: #fff;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  background-color: #3a3a3a;
+  color: #f3ecec;
+  font-family: 'Ubuntu', sans-serif;
+  transition: all 0.3s ease;
 }
+
+.filtro-grupo select:focus, 
+.filtro-grupo input:focus {
+  outline: none;
+  border-color: #db9e1b;
+  box-shadow: 0 0 0 2px rgba(219, 158, 27, 0.2);
+}
+
 
 
 .btn-filtrar {
-  background-color: #4C6B9F;
-  color: white;
+  background: linear-gradient(135deg, #db9e1b, #c47d7f);
+  color: #131212;
   border: none;
-  padding: 10px 15px;
-  border-radius: 4px;
+  padding: 12px 15px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  font-family: 'Ubuntu', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .btn-filtrar:hover {
-  background-color: #3a5683;
+  background: linear-gradient(135deg, #c47d7f, #db9e1b);
+  transform: translateY(-2px);
 }
 
+
 .btn-limpiar {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 4px;
+  background: transparent;
+  color: #c47d7f;
+  border: 1px solid #c47d7f;
+  padding: 11px 15px;
+  border-radius: 6px;
   text-decoration: none;
   display: inline-block;
   text-align: center;
   font-weight: 600;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  font-family: 'Ubuntu', sans-serif;
 }
 
 .btn-limpiar:hover {
-  background-color: #5a6268;
-  color: white;
+  background: rgba(196, 125, 127, 0.1);
+  color: #db9e1b;
+  border-color: #db9e1b;
 }
 
 .resultados-count {
   margin: 15px 0;
   font-style: italic;
-  color: #6c757d;
+  color: #c47d7f;
+  font-size: 0.9rem;
+}
+
+.filtro-grupo option {
+  background: #3a3a3a;
+  color: #f3ecec;
+  padding: 10px;
+}
+
+@media (max-width: 768px) {
+  .filtro-form {
+    grid-template-columns: 1fr;
+  }
+  
+  .filtros-title {
+    font-size: 1.1rem;
+  }
 }
 
 .sin-metas {
@@ -785,12 +862,16 @@ ul {
 }
 
 .card-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 15px;
-  padding-top: 15px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 100%);
 }
 
 
@@ -811,12 +892,13 @@ ul {
 }
 
 .btn-ver {
-  background: linear-gradient(135deg, #4C6B9F, #3a5683);
+  
+  background: linear-gradient(135deg, #28a745, #1e7e34);
   color: white;
 }
 
 .btn-editar {
-  background: linear-gradient(135deg, #28a745, #1e7e34);
+  background: linear-gradient(135deg, #4C6B9F, #3a5683);
   padding: 8px 8px;
   color: white;
 }
@@ -839,14 +921,16 @@ ul {
 .meta-acciones {
   display: flex;
   gap: 10px;
+  align-items: center;
 }
 
-.delete-form {
-  margin-left: auto;
+.meta-descripcion {
+  font-size: 0.8rem;
+  color: #c2e9fb;
 }
 
 
-.streak-card .meta-acciones {
+.streak-card .meta-acciones, .streak-card-extended .meta-acciones {
   position: absolute;
   bottom: 15px;
   left: 15px;
@@ -866,3 +950,6 @@ ul {
   height: 16px;
 }
 
+.streak-card-extended > *:not(.importancia-indicador):not(.card-footer) {
+  margin-bottom: 20px;
+}
