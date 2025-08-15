@@ -13,7 +13,8 @@ try {
     $connection = new PDO("pgsql:host=$host;port=$port;dbname=$db", $user, $pass);
     $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
+    error_log("Error de conexión a la base de datos: " . $e->getMessage());
+    die(json_encode(['success' => false, 'error' => 'Error de conexión a la base de datos']));
 }
 
 ?>

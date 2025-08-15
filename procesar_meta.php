@@ -25,5 +25,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['meta_id'], $_POST['ac
     }
 }
 
-header('Location: dashboard.php');
+header('Location: mis_metas.php');
 exit();

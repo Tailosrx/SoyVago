@@ -103,17 +103,15 @@ $metas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </a>
                         </li>
                         <li class="sidebar__item">
-                            <a class="sidebar__link" href="#" data-tooltip="Tareas/Hábitos">
+                            <a class="sidebar__link" href="#" data-tooltip="Mis Metas">
                                 <span class="icon">
-                                    <svg width="16" height="16" fill="currentColor" class="bi bi-check-circle"
+                                    <svg width="16" height="16" fill="currentColor" class="bi bi-trophy"
                                         viewBox="0 0 16 16">
                                         <path
-                                            d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                                        <path
-                                            d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z" />
+                                            d="M3 1a1 1 0 0 0-1 1v2a3 3 0 0 0 2.5 2.959V6a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v.959A3 3 0 0 0 14 4V2a1 1 0 0 0-1-1H3zm10 2a2 2 0 0 1-1 1.732V2h1v1zm-1 3.1A3.001 3.001 0 0 1 8 8a3.001 3.001 0 0 1-4-1.9V2h8v3.1zM2 2v1.732A2 2 0 0 1 3 2H2zm6 7a4 4 0 0 0 4-4h1a5 5 0 0 1-5 5v1h1a1 1 0 0 1 1 1v1H5v-1a1 1 0 0 1 1-1h1v-1a5 5 0 0 1-5-5h1a4 4 0 0 0 4 4z" />
                                     </svg>
                                 </span>
-                                <span class="text">Tareas/Hábitos</span>
+                                <span class="text">Logros</span>
                             </a>
                         </li>
                         <li class="sidebar__item">
@@ -223,26 +221,14 @@ $metas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <p class="sin-metas">No hay metas que coincidan con tus criterios de filtrado.</p>
                     <?php else: ?>
                         <?php foreach ($metas as $meta): ?>
-                            <div class="streak-card-extended" data-importancia="<?= $meta['importancia'] ?>"
-                                style="--card-color: <?= $meta['color'] ?>;">
+                            <div class="streak-card-extended <?= $meta['completado'] ? 'completada' : '' ?>"
+                                data-importancia="<?= $meta['importancia'] ?>" style="--card-color: <?= $meta['color'] ?>;">
                                 <div class="importancia-indicador"
                                     title="Importancia: <?= importanciaTexto($meta['importancia']) ?>">
                                     <h5><?= importanciaTexto($meta['importancia']) ?></h5>
                                 </div>
 
                                 <h3><?= htmlspecialchars($meta['titulo']) ?></h3>
-
-                                <?php if (!empty($meta['descripcion'])): ?>
-                                    <p class="meta-descripcion">
-                                        <?php
-                                        $descripcion = htmlspecialchars(trim($meta['descripcion']));
-                                        $primeraLinea = strtok($descripcion, "\n");
-                                        echo (strlen($primeraLinea) > 36)
-                                            ? substr($primeraLinea, 0, 36) . '...'
-                                            : $primeraLinea . (strpos($descripcion, "\n") !== false ? '...' : '');
-                                        ?>
-                                    </p>
-                                <?php endif; ?>
 
                                 <div class="streak-progress">
                                     <div class="progress-bar" style="width: <?= min(100, ($meta['racha'] ?? 0) * 10) ?>%"></div>
@@ -265,23 +251,33 @@ $metas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
 
                                 <div class="card-footer">
-                                    <div class="meta-acciones">
-                                        <a href="ver_meta.php?id=<?= $meta['id'] ?>" class="btn-ver">
+                                    <?php if ($meta['completado']): ?>
+                                        <button class="btn-ver completado" disabled>
+                                            <svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                            </svg>
+                                            ✓ Completada
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn-ver"
+                                            onclick="confirmarCompletar(<?= $meta['id'] ?>, '<?= htmlspecialchars($meta['titulo'], ENT_QUOTES) ?>')">
                                             <svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                 <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                                             </svg>
                                             Completar Meta
-                                        </a>
+                                        </button>
+                                    <?php endif; ?>
 
-                                        <a href="editar_meta.php?id=<?= $meta['id'] ?>" class="btn-editar">
-                                            <svg class="icon-editar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                                <path
-                                                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                                            </svg>
-                                        </a>
-                                    </div>
+                                    <a href="editar_meta.php?id=<?= $meta['id'] ?>"
+                                        class="btn-editar <?= $meta['completado'] ? 'completado' : '' ?>">
+                                        <svg class="icon-editar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                            <path
+                                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                        </svg>
+                                    </a>
 
-                                    <form method="POST" action="procesar_meta.php" class="delete-form">
+                                    <form method="POST" action="procesar_meta.php"
+                                        class="delete-form <?= $meta['completado'] ? 'completado' : '' ?>">
                                         <input type="hidden" name="meta_id" value="<?= $meta['id'] ?>">
                                         <input type="hidden" name="accion" value="eliminar">
                                         <button type="submit" class="delete-btn">
@@ -296,21 +292,64 @@ $metas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
+
+                    <a href="nueva_meta.php" class="add-button">
+                        <span>＋</span>
+                    </a>
                 </div>
             </section>
         </main>
 
+        <div id="confirmacion-overlay" class="confirmacion-overlay">
+            <div class="confirmacion-modal">
+                <p id="confirmacion-texto">¿Estás seguro de que deseas completar esta meta?</p>
+                <div class="modal-buttons">
+                    <button id="btn-cancelar" class="btn-cancelar">Cancelar</button>
+                    <button id="btn-confirmar" class="btn-confirmar">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let metaIdActual = null;
+
+            function confirmarCompletar(metaId, titulo) {
+                metaIdActual = metaId;
+                document.getElementById('confirmacion-texto').textContent =
+                    `¿Estás seguro de que has completado "${titulo}"?`;
+                document.getElementById('confirmacion-overlay').classList.add('active');
+            }
+
+            document.getElementById('btn-cancelar').addEventListener('click', function () {
+                document.getElementById('confirmacion-overlay').classList.remove('active');
+                metaIdActual = null;
+            });
+
+            document.getElementById('btn-confirmar').addEventListener('click', function () {
+                if (metaIdActual) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = 'procesar_meta.php';
+
+                    const metaIdInput = document.createElement('input');
+                    metaIdInput.type = 'hidden';
+                    metaIdInput.name = 'meta_id';
+                    metaIdInput.value = metaIdActual;
+
+                    const accionInput = document.createElement('input');
+                    accionInput.type = 'hidden';
+                    accionInput.name = 'accion';
+                    accionInput.value = 'completar';
 
 
+                    form.appendChild(metaIdInput);
+                    form.appendChild(accionInput);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
 
-
-
-
-
-
-
-
-
+        </script>
 </body>
 
 </html>

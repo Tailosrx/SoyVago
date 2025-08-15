@@ -29,7 +29,6 @@ if (!$meta) {
 // Procesar el formulario de edición
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $titulo = trim($_POST['titulo']);
-    $descripcion = trim($_POST['descripcion']);
     $importancia = intval($_POST['importancia']);
     $fecha_limite = !empty($_POST['fecha_limite']) ? $_POST['fecha_limite'] : null;
     $color = $_POST['color'] ?? '#4C6B9F';
@@ -41,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Actualizar la meta en la base de datos
         $sql = "UPDATE metas SET 
                 titulo = :titulo, 
-                descripcion = :descripcion, 
                 importancia = :importancia, 
                 fecha_limite = :fecha_limite,
                 color = :color
@@ -50,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $connection->prepare($sql);
         $stmt->execute([
             'titulo' => $titulo,
-            'descripcion' => $descripcion,
             'importancia' => $importancia,
             'fecha_limite' => $fecha_limite,
             'color' => $color,
@@ -152,10 +149,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="text" id="titulo" name="titulo" value="<?= htmlspecialchars($meta['titulo']) ?>" required>
                 </div>
                 
-                <div>
-                    <label for="descripcion">Descripción:</label>
-                    <textarea id="descripcion" name="descripcion"><?= htmlspecialchars($meta['descripcion']) ?></textarea>
-                </div>
                 
                 <div>
                     <label for="importancia">Importancia:</label>

@@ -292,10 +292,9 @@ require_once 'controllers/get_ajustes.php';
                         </div>
 
                         <div class="ajuste-item" style="flex-direction: column; align-items: flex-start;">
-                            <h4>Color principal</h4>
+                            <h4>Color de los Iconos</h4>
                             <div class="color-options">
-                                <div class="color-option selected" style="background: #db9e1b;" data-color="#db9e1b">
-                                </div>
+                                <div class="color-option selected" style="background: #db9e1b;" data-color="#db9e1b"></div>
                                 <div class="color-option" style="background: #c47d7f;" data-color="#c47d7f"></div>
                                 <div class="color-option" style="background: #4C6B9F;" data-color="#4C6B9F"></div>
                                 <div class="color-option" style="background: #2ed573;" data-color="#2ed573"></div>
@@ -348,28 +347,44 @@ require_once 'controllers/get_ajustes.php';
                 }
             });
 
+            const colorOptions = document.querySelectorAll('.color-option');
+            const colorPrincipalInput = document.getElementById('color-principal');
 
-            document.querySelectorAll('.color-option').forEach(option => {
-                option.addEventListener('click', function () {
-                    document.querySelectorAll('.color-option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    this.classList.add('selected');
-                    document.getElementById('color-principal').value = this.dataset.color;
+            // Función para aplicar el color
+            function applyIconColor(color) {
+                document.querySelectorAll('.sidebar svg').forEach(svg => {
+                    svg.style.setProperty('fill', color, 'important'); // Usamos important aquí también
                 });
+            }
 
-                // Marcar el color actual como seleccionado
-                if (this.dataset.color === "<?= $ajustes['color_principal'] ?>") {
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function () {
+                    colorOptions.forEach(opt => opt.classList.remove('selected'));
                     this.classList.add('selected');
-                }
+
+                    const selectedColor = this.getAttribute('data-color');
+                    colorPrincipalInput.value = selectedColor;
+
+                    // Aplicar el color
+                    applyIconColor(selectedColor);
+                });
             });
 
-            // Confirmación para eliminar cuenta
-            document.getElementById('btn-eliminar').addEventListener('click', function () {
-                if (confirm('¿Estás completamente seguro? Esto borrará todos tus datos permanentemente.')) {
-                    window.location.href = 'eliminar_cuenta.php';
+            const savedColor = "<?= $ajustes['color_principal'] ?>";
+            if (savedColor) {
+                applyIconColor(savedColor);
+
+                const savedOption = document.querySelector(`.color-option[data-color="${savedColor}"]`);
+                if (savedOption) {
+                    savedOption.classList.add('selected');
+                } else {
+                    colorOptions[0]?.classList.add('selected');
                 }
-            });
+            } else {
+                colorOptions[0]?.classList.add('selected');
+            }
+
+
         });
 
     </script>

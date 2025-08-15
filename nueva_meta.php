@@ -9,7 +9,6 @@ if (!isset($_SESSION['usuario_id'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $titulo = trim($_POST['titulo']);
-    $descripcion = trim($_POST['descripcion']);
     $fecha_limite = !empty($_POST['fecha_limite']) ? $_POST['fecha_limite'] : null;
     $importancia = $_POST['importancia'] ?? 3;
     $colores = ['#4C6B9F', '#588157', '#9C3D54', '#6B4226', '#3E6C7D', '#7E4A35', '#486966', '#8A5E3B'];
@@ -20,14 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $stmt = $connection->prepare("
-    INSERT INTO metas (usuario_id, titulo, descripcion, completado, fecha_creacion, fecha_limite, importancia, color)
-    VALUES (:usuario_id, :titulo, :descripcion, FALSE, NOW(), :fecha_limite, :importancia, :color)
+    INSERT INTO metas (usuario_id, titulo, completado, fecha_creacion, fecha_limite, importancia, color)
+    VALUES (:usuario_id, :titulo,  FALSE, NOW(), :fecha_limite, :importancia, :color)
 ");
 
     $stmt->execute([
     'usuario_id' => $_SESSION['usuario_id'],
     'titulo' => $titulo,
-    'descripcion' => $descripcion,
     'importancia' => $importancia,
     'fecha_limite' => $fecha_limite,
     'color' => $color_aleatorio
@@ -62,9 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST" action="">
             <label for="titulo">Título *</label>
             <input type="text" name="titulo" id="titulo" required>
-
-            <label for="descripcion">Descripción</label>
-            <textarea name="descripcion" id="descripcion" rows="3"></textarea>
 
             <label for="fecha_limite">Fecha Límite</label>
             <input type="date" name="fecha_limite" id="fecha_limite">

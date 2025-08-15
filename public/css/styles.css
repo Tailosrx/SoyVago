@@ -104,7 +104,7 @@ button {
     --bg--active: hsla(203, 86%, 93%, 0.7);
     --bg--hover: hsl(200, 7%, 84%);
     --bg--focus: hsl(203, 100%, 100%);
-    --gray--primary: hsl(200, 10%, 50%);
+    --color--selected: hsl(200, 10%, 50%);
     --gray--secondary: hsl(200, 14%, 30%);
 
     --dark--primary: hsl(203, 13%, 14%);
@@ -120,6 +120,8 @@ button {
     --brad-outer: 0.75rem;
     --frame-space: 0.5rem;
     --brad-inner: calc(var(--brad-outer) - var(--frame-space));
+
+    --text-color: initial;
 }
 
 .vertical-sidebar {
@@ -131,7 +133,9 @@ button {
   height: 100vh;
   z-index: 1000;
   overflow-y: auto;
+  
 }
+
 
 
 nav {
@@ -144,6 +148,8 @@ nav {
     padding: var(--frame-space);
     box-shadow: 0 3px 5px #1233, 0 5px 17px #0003;
     overflow: hidden;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px ;
 }
 
 
@@ -176,7 +182,6 @@ nav {
 
 .toggle-svg-icon {
     grid-area: svg;
-    fill: var(--gray--primary);
     transition: fill 233ms ease-in;
 }
 
@@ -261,7 +266,8 @@ nav {
         place-self: center;
         inline-size: var(--svg);
         block-size: var(--svg);
-        fill: var(--gray--primary);
+        fill: var(--icon-color, hsl(200, 10%, 50%)); /* Color por defecto (#db9e1b) */
+        transition: fill 0.3s ease;
     }
 }
 
@@ -386,12 +392,54 @@ aside:not(:has(:checked))
 }
 
 .hoy {
-  background: #FF9248;
-  font-weight: bold;
+  padding: 1rem 2rem;
+  background-color: #1e1e1e; /* Fondo ligeramente más claro para diferenciar */
+  border-top: 2px solid #333;
+}
+
+.meta-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.metas-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.metas-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #2a2a2a;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.metas-list li:hover {
+  background-color: #333;
+}
+
+.metas-list input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #00c853; /* Verde para completado */
+  cursor: pointer;
+}
+
+.metas-list li.completada {
+  text-decoration: line-through;
+  opacity: 0.6;
 }
 
 .dia.hoy span, .dia.hoy strong {
-  color: black;
+  color: white;
 }
 
 /* Grid para las rachas */
@@ -399,6 +447,7 @@ aside:not(:has(:checked))
 .streaks{
   margin-bottom: 20mm;
 }
+
 .streak-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -409,12 +458,6 @@ aside:not(:has(:checked))
 
 .streak-card, .streak-card-extended {
   background: var(--card-color) !important;
-}
-
-
-.streak-card  {
-  position: relative;
-  background: var(--card-color);
   color: #c2e9fb;
   padding: 15px;
   border-radius: 10px;
@@ -423,21 +466,14 @@ aside:not(:has(:checked))
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: visible; 
+  overflow: hidden;
+  
 }
 
-.streak-card-extended {
-  position: relative;
-  background: var(--card-color);
-  color: #c2e9fb;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  height: 120%;
-  overflow: visible; 
+.streak-card:hover,
+.streak-card-extended:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 
@@ -499,33 +535,38 @@ aside:not(:has(:checked))
 }
 
 
-
-
 .delete-form {
-  margin-left: auto;
-  position: static; /* Elimina el posicionamiento absoluto anterior */
+  display: flex;
+  align-items: row;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
 }
 
 .delete-btn {
-  background: #e74c3c;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
   border: none;
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-left: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 
 
-.delete-btn svg, .btn-editar svg {
-  width: 18px;
-  height: 18px;
-  fill: white;
+.btn-ver svg,
+.btn-editar svg,
+.delete-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 
@@ -540,18 +581,20 @@ aside:not(:has(:checked))
 }
 
 /* Estilos para texto legible sobre colores */
-.streak-card h3, .streak-card-extended h3 {
-  position: relative;
-  z-index: 1;
+.streak-card-extended h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: white;
 }
 
-.streak-card p, .streak-card-extended p {
-  position: relative;
-  z-index: 1;
+.streak-card-extended p {
+  font-size: 0.9rem;
+  color: #a3b7c0;
+  margin-bottom: 10px;
 }
 
 .fecha-container {
-  margin: 10px 0;
+  margin-top: auto;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -575,7 +618,7 @@ aside:not(:has(:checked))
   height: 8px;
   background: #f0f0f0;
   border-radius: 4px;
-  margin: 10px 0;
+  margin: 12px 0;
   overflow: hidden;
 }
 
@@ -590,18 +633,50 @@ aside:not(:has(:checked))
   background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
-  .streak-grid {
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  .card-footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .meta-acciones {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .delete-form {
+    align-self: center;
+  }
+
+  .btn-ver,
+  .btn-editar,
+  .delete-btn {
+    flex: 1;
+    max-width: none;
+  }
+
+  .btn-ver {
+    min-width: 120px;
   }
 }
 
+/* Ajustes adicionales para pantallas muy pequeñas */
 @media (max-width: 480px) {
   .streak-grid {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .card-footer {
+    padding-top: 12px;
+  }
+
+  .meta-acciones {
+    gap: 6px;
   }
 }
+
 
 section .hoy{
   margin-top: 10mm;
@@ -716,7 +791,7 @@ ul {
 
 .center-title {
   text-align: center;
-  margin-bottom: 10mm;
+  margin-bottom: 14mm;
   margin-top: 10mm;
 }
 
@@ -727,6 +802,7 @@ ul {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   margin-bottom: 30px;
+  margin-top: 10mm;
   border: 1px solid #3a3a3a;
 }
 
@@ -861,45 +937,42 @@ ul {
   grid-column: 1 / -1;
 }
 
-.card-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 15px;
+.streak-card-extended .card-footer {
+  margin-top: auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 100%);
+  gap: 10px;
 }
 
 
-.btn-ver, .btn-editar {
+.btn-ver,
+.btn-editar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 15px;
-  border-radius: 20px;
   text-decoration: none;
   font-weight: 500;
   font-size: 0.85rem;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  margin: 0 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border: none;
   cursor: pointer;
+  white-space: nowrap;
+  min-height: 36px;
 }
 
 .btn-ver {
-  
+  padding: 8px 15px;
+  border-radius: 10px;
   background: linear-gradient(135deg, #28a745, #1e7e34);
   color: white;
 }
 
 .btn-editar {
   background: linear-gradient(135deg, #4C6B9F, #3a5683);
-  padding: 8px 8px;
+  border-radius: 10px;
+  padding: 8px 10px;
   color: white;
 }
 
@@ -908,15 +981,15 @@ ul {
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-.btn-ver:active, .btn-editar:active, .delete-btn:active {
-  transform: translateY(1px);
+.btn-ver:active,
+.btn-editar:active,
+.delete-btn:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.btn-ver svg {
-  margin-right: 5px;
-  width: 16px;
-  height: 16px;
-}
+
+
 
 .meta-acciones {
   display: flex;
@@ -926,12 +999,11 @@ ul {
 
 .meta-descripcion {
   font-size: 0.8rem;
-  color: #c2e9fb;
+  color: #a3b7c0;
 }
 
 
 .streak-card .meta-acciones, .streak-card-extended .meta-acciones {
-  position: absolute;
   bottom: 15px;
   left: 15px;
   right: 15px;
@@ -952,4 +1024,90 @@ ul {
 
 .streak-card-extended > *:not(.importancia-indicador):not(.card-footer) {
   margin-bottom: 20px;
+}
+
+
+.sidebar svg {
+  fill: var(--icon-color, currentColor) !important; /* !important para forzar la prioridad */
+  transition: fill 0.3s ease;
+}
+
+.color-option.selected {
+  border-color: white;
+  box-shadow: 0 0 0 2px #db9e1b;
+}
+
+.confirmacion-overlay {
+  position: fixed; /* para que no afecte al layout */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6); /* fondo semitransparente */
+  display: none;
+  visibility: hidden;
+  pointer-events: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* por encima de todo */
+}
+
+.confirmacion-overlay.active {
+  display: flex; /* mostrar cuando esté activo */
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.confirmacion-modal {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos para metas completadas */
+.streak-card-extended.completada, .streak-card.completada {
+  background: linear-gradient(135deg, #a1c4fd, #c2e9fb); /* Fondo más claro */
+  color: #6c757d; /* Texto gris */
+  opacity: 0.8; /* Transparencia para diferenciar */
+  text-decoration: line-through; /* Línea sobre el texto */
+  border: 2px solid #28a745; /* Borde verde para indicar completado */
+  transition: all 0.3s ease;
+}
+
+.streak-card-extended.completada:hover,
+.streak-card.completada:hover {
+  transform: none; /* Sin efecto hover */
+  box-shadow: none; /* Sin sombra */
+}
+
+.streak-card-extended.completada h3 {
+  color: #495057; /* Texto más oscuro */
+}
+
+.streak-card-extended.completada .progress-bar {
+  background: linear-gradient(90deg, #28a745, #1e7e34); /* Barra de progreso verde */
+}
+
+.streak-card-extended.completada .fecha-limite {
+  color: #6c757d; /* Texto gris */
+}
+
+.streak-card-extended.completada .vencido {
+  display: none; /* Ocultar el texto de vencido */
+}
+
+.btn-ver.completado, .btn-editar.completado, .delete-btn.completado {
+  background: linear-gradient(135deg, #28a745, #1e7e34); /* Fondo verde */
+  color: white;
+  cursor: not-allowed; /* Cursor deshabilitado */
+  opacity: 0.7; /* Transparencia */
+}
+
+.btn-ver.completado:hover {
+  transform: none; /* Sin efecto hover */
+  box-shadow: none; /* Sin sombra */
 }
