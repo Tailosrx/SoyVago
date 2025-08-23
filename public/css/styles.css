@@ -465,10 +465,14 @@ aside:not(:has(:checked))
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   height: 100%;
   overflow: hidden;
+  position: relative;
   
 }
+
+
 
 .streak-card:hover,
 .streak-card-extended:hover {
@@ -581,10 +585,16 @@ aside:not(:has(:checked))
 }
 
 /* Estilos para texto legible sobre colores */
-.streak-card-extended h3 {
+.streak-card h3, .streak-card-extended h3 {
   font-size: 1.2rem;
-  margin-bottom: 10px;
+  font-weight: bold;
+  margin: 10 0 10px;
   color: white;
+  line-height: 1.4;
+  max-height: 2.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .streak-card-extended p {
@@ -633,7 +643,49 @@ aside:not(:has(:checked))
   background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
 }
 
+.streak-card .card-footer, .streak-card-extended .card-footer {
+  margin-top: auto; /* Empuja el footer al final */
+  display: flex;
+  justify-content: space-between; /* Alinea los botones y otros elementos */
+  align-items: center;
+  gap: 10px;
+}
+
+.streak-card .delete-form, .streak-card-extended .delete-form {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.streak-card .delete-btn, .streak-card-extended .delete-btn {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  border: none;
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.streak-card .delete-btn:hover, .streak-card-extended .delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.streak-card .delete-btn:active, .streak-card-extended .delete-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 @media (max-width: 768px) {
+
+
   .card-footer {
     flex-direction: column;
     gap: 12px;
@@ -928,7 +980,62 @@ ul {
   .filtros-title {
     font-size: 1.1rem;
   }
+
+  .app-container {
+    flex-direction: column;
+  }
+  
+  .vertical-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    border-radius: 0;
+  }
+  
+  nav {
+    border-radius: 0;
+    flex-direction: row;
+    padding: 10px;
+  }
+  
+  .sidebar__list {
+    flex-direction: row;
+    gap: 5px;
+  }
+  
+  .sidebar__list.list--primary,
+  .sidebar__list.list--secondary {
+    margin: 0;
+  }
+  
+  .sidebar__wrapper {
+    flex-direction: row;
+    width: 100%;
+    gap: 5px;
+  }
+  
+  .perfil-container {
+    margin: 0;
+    padding: 15px;
+    border-radius: 0;
+  }
+  
+  .perfil-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .perfil-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .logros {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
 }
+
+
 
 .sin-metas {
   text-align: center;
@@ -1111,3 +1218,4 @@ ul {
   transform: none; /* Sin efecto hover */
   box-shadow: none; /* Sin sombra */
 }
+

@@ -70,8 +70,6 @@ function procesarRegistro($connection) {
     $_SESSION['nombre'] = $nombre;
     $_SESSION['email'] = $email;
 
-    $_SESSION['onboarding_pendiente'] = true;
-        header('Location: onboarding.php');
     
     exit();
 }

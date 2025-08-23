@@ -1,7 +1,7 @@
 <?php
-// 🔹 Parte 1: lógica de backend
-session_start();
+
 require_once "config/db.php"; // ajusta la ruta según tu estructura
+session_start();
 
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: registro.php");
@@ -11,12 +11,12 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id = $_SESSION['usuario_id'];
 
 // Consultar tareas
-$queryTareas = $conexion->prepare("SELECT * FROM tareas WHERE usuario_id = :usuario_id ORDER BY fecha ASC");
+$queryTareas = $connection->prepare("SELECT * FROM tareas WHERE usuario_id = :usuario_id ORDER BY fecha ASC");
 $queryTareas->execute(['usuario_id' => $usuario_id]);
 $tareas = $queryTareas->fetchAll(PDO::FETCH_ASSOC);
 
 // Consultar rachas
-$queryRachas = $conexion->prepare("SELECT * FROM rachas WHERE usuario_id = :usuario_id");
+$queryRachas = $connection->prepare("SELECT * FROM rachas WHERE usuario_id = :usuario_id");
 $queryRachas->execute(['usuario_id' => $usuario_id]);
 $rachas = $queryRachas->fetchAll(PDO::FETCH_ASSOC);
 ?>

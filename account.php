@@ -1,7 +1,6 @@
 <?php
 session_start();
 require_once 'config/db.php';
-require_once 'helpers.php';
 require_once 'controllers/get_ajustes.php';
 
 if (!isset($_SESSION['usuario_id'])) {
@@ -9,53 +8,84 @@ if (!isset($_SESSION['usuario_id'])) {
     exit();
 }
 
-// Obtener metas del usuario
-$stmt = $connection->prepare("SELECT * FROM metas 
-    WHERE usuario_id = :usuario_id 
-    ORDER BY fecha_creacion DESC LIMIT 5");
-$stmt->execute(['usuario_id' => $_SESSION['usuario_id']]);
-$metas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$userId = (int) $_SESSION['usuario_id'];
 
-// Obtener progreso
-$stmt = $connection->prepare("SELECT COUNT(*) as completadas FROM metas WHERE usuario_id = :usuario_id AND completado = TRUE");
-$stmt->execute(['usuario_id' => $_SESSION['usuario_id']]);
-$progreso = $stmt->fetch(PDO::FETCH_ASSOC);
+/* --- Datos del usuario --- */
+$sqlUser = "SELECT id, nombre, email, nivel, puntos, 
+                   fecha_registro, avatar,      
+                   notificaciones, modo_oscuro, color_principal
+            FROM usuarios
+            WHERE id = :id";
 
-function importanciaTexto($nivel)
-{
-    switch ($nivel) {
-        case 1:
-            return 'Poco importante';
-        case 2:
-            return 'Importante';
-        case 3:
-            return 'Muy importante';
-        default:
-            return 'Importancia no definida';
-    }
+$stmt = $connection->prepare($sqlUser);
+$stmt->execute(['id' => $userId]);
+$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$usuario['avatar'] = !empty($usuario['avatar']) ? $usuario['avatar'] : 'public/img/default.png';
+
+
+if (!$usuario) {
+    die('Usuario no encontrado.');
 }
 
+/* --- Estadísticas rápidas de metas --- */
+$sqlStats = "SELECT
+               COUNT(*) FILTER (WHERE completado = FALSE) AS activas,
+               COUNT(*) FILTER (WHERE completado = TRUE)  AS completadas
+             FROM metas
+             WHERE usuario_id = :id";
+$stmt = $connection->prepare($sqlStats);
+$stmt->execute(['id' => $userId]);
+$stats = $stmt->fetch(PDO::FETCH_ASSOC) ?: ['activas' => 0, 'completadas' => 0];
+
+/* --- Logros del usuario (opcional: si aún no creaste las tablas, esto se omite sin romper) --- */
+$logros = [];
+try {
+    $sqlLogros = "SELECT l.id, l.nombre, l.descripcion, l.icono, ul.fecha_desbloqueo
+                  FROM usuario_logros ul
+                  JOIN logros l ON l.id = ul.logro_id
+                  WHERE ul.usuario_id = :id
+                  ORDER BY ul.fecha_desbloqueo DESC
+                  LIMIT 12";
+    $st = $connection->prepare($sqlLogros);
+    $st->execute(['id' => $userId]);
+    $logros = $st->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    // Si las tablas de logros aún no existen, seguimos sin logros
+}
+
+/* --- Preferencias visuales --- */
+$modoOscuro = !empty($usuario['modo_oscuro']);
+$colorPrincipal = $usuario['color_principal'] ?: '#db9e1b';
 ?>
+
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Dashboard - SoyVago</title>
-    <link rel="stylesheet" href="public\css\styles.css">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta - SoyVago</title>
+    <link rel="stylesheet" href="public/css/styles.css">
+    <style>
+    .perfil-container{max-width:900px;margin:24px auto;padding:24px;background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    body.modo-oscuro .perfil-container{background:#1f1f1f;color:#eee}
+    .perfil-header{display:flex;gap:16px;align-items:center}
+    .avatar{width:96px;height:96px;border-radius:50%;background:#ddd;display:block;object-fit:cover}
+    .perfil-badges{display:flex;gap:12px;margin-top:8px}
+    .badge{background:rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-size:.9rem}
+    body.modo-oscuro .badge{background:rgba(255,255,255,.1)}
+    .perfil-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
+    .card{padding:16px;border-radius:12px;background:rgba(0,0,0,.03)}
+    body.modo-oscuro .card{background:rgba(255,255,255,.06)}
+    .logros{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:16px}
+    .logro{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;border-radius:10px;background:rgba(0,0,0,.03);text-align:center}
+    body.modo-oscuro .logro{background:rgba(255,255,255,.06)}
+    .color-chip{display:inline-block;width:16px;height:16px;border-radius:4px;border:1px solid rgba(0,0,0,.15);vertical-align:middle}
+  </style>
 </head>
-
 <body class="<?= $ajustes['modo_oscuro'] ? 'modo-oscuro' : 'modo-diurno' ?>">
-
-    <div class="nav-welcome">
-        <h4>Hola <?= htmlspecialchars($_SESSION['nombre']) ?>,</h4>
-        <h2>Bienvenido</h2> <!-- Falta añadir genero para cambiar -->
-    </div>
-
-    <hr>
-
-    <div class="app-container">
-        <aside class="vertical-sidebar">
+<div class="app-container">
+<aside class="vertical-sidebar">
             <nav>
                 <section class="sidebar__wrapper">
                     <ul class="sidebar__list list--primary">
@@ -114,7 +144,7 @@ function importanciaTexto($nivel)
                     </ul>
                     <hr>
                     <ul class="sidebar__list list--secondary">
-                        <li class="sidebar__item"> <a class="sidebar__link" href="account.php" data-tooltip="Profile"> <span
+                        <li class="sidebar__item"> <a class="sidebar__link" href="#" data-tooltip="Profile"> <span
                                     class="icon"> <svg width="16" height="16" fill="currentColor"
                                         class="bi bi-person-circle" viewBox="0 0 16 16">
                                         <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
@@ -142,102 +172,71 @@ function importanciaTexto($nivel)
             </nav>
         </aside>
 
-        <main class="main-content">
 
-            <div class="semana-calendario">
-                <?php
-                $dias = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'];
-                $hoy = date('w');
-                for ($i = 0; $i < 7; $i++):
-                    $dia = date('d', strtotime("+$i day"));
-                    $clase = ($i == 0) ? 'hoy' : '';
-                    ?>
-                    <div class="dia <?= $clase ?>">
-                        <span><?= $dias[(date('w') + $i) % 7] ?></span>
-                        <strong><?= $dia ?></strong>
-                    </div>
-                <?php endfor; ?>
-            </div>
-
-            <!-- Reemplaza la sección streaks con este código -->
-            <section class="streaks">
-                <h2>Rachas</h2>
-                <div class="streak-grid">
-                    <?php foreach ($metas as $meta): ?>
-                        <div class="streak-card" data-importancia="<?= $meta['importancia'] ?>"
-                            style="--card-color: <?= $meta['color'] ?>;">
-                            <div class="importancia-indicador"
-                                title="Importancia: <?= importanciaTexto($meta['importancia']) ?>">
-                                <h5><?= importanciaTexto($meta['importancia']) ?></h5>
-                            </div>
-
-                            <h3><?= htmlspecialchars($meta['titulo']) ?></h3>
-                            <div class="streak-progress">
-                                <div class="progress-bar" style="width: <?= min(100, ($meta['racha'] ?? 0) * 10) ?>%"></div>
-                            </div>
-                            <p>Racha: <?= $meta['racha'] ?? 0 ?> días</p>
-                            <?php if ($meta['fecha_limite']): ?>
-                                <p class="fecha-limite">📅 <?= date('d/m/Y', strtotime($meta['fecha_limite'])) ?></p>
-                            <?php endif; ?>
-
-
-                            <form method="POST" action="procesar_meta.php" class="delete-form">
-                                <input type="hidden" name="meta_id" value="<?= $meta['id'] ?>">
-                                <input type="hidden" name="accion" value="eliminar">
-                                <button type="submit" class="delete-btn" onclick="">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                        <path
-                                            d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </section>
-
-
-            <h2>Tareas de Hoy</h2>
-            <section class="hoy">
-
-                <ul class="metas-list">
-                    <?php foreach ($metas as $meta): ?>
-                        <li class="<?= $meta['completado'] ? 'completada' : '' ?>">
-                            <label>
-                                <form action="procesar_meta.php" method="POST" class="meta-actions">
-                                    <input type="hidden" name="meta_id" value="<?= $meta['id'] ?>">
-                                    <input type="checkbox" <?= $meta['completado'] ? 'checked disabled' : '' ?>
-                                        onchange="this.form.submit()" name="accion" value="completar">
-                                    <?= htmlspecialchars($meta['titulo']) ?>
-                                </form>
-                            </label>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </section>
-
-            <a href="nueva_meta.php" class="add-button">
-                <span>＋</span>
-            </a>
-        </main>
-
+<div class="perfil-container">
+  <div class="perfil-header">
+    <!-- Si aún no tienes avatar, muestra Tigri -->
+    <img class="avatar" src="<?= htmlspecialchars($usuario['avatar'] )?>" alt="Avatar">    <div>
+        <h2><?= htmlspecialchars($usuario['nombre']) ?></h2>
+        <div class="perfil-badges">
+            <span class="badge">Nivel <?= (int)$usuario['nivel'] ?></span>
+            <span class="badge"><?= (int)$usuario['puntos'] ?> pts</span>
+            <?php if (!empty($usuario['fecha_registro'])): ?>
+                <span class="badge">Desde <?= date('d/m/Y', strtotime($usuario['fecha_registro'])) ?></span>
+            <?php endif; ?>
+        </div>
     </div>
+</div>
 
 
+<!-- Formulario para subir imagen -->
+<div class="card" style="margin-top: 20px;">
+    <h4>Subir imagen de perfil</h4>
+    <form action="subir_avatar.php" method="POST" enctype="multipart/form-data">
+        <label for="avatar">Selecciona una imagen:</label>
+        <input type="file" name="avatar" id="avatar" accept="image/*" required>
+        <button type="submit">Subir</button>
+    </form>
+</div>
 
+  <div class="perfil-grid">
+    <div class="card">
+      <h4>Preferencias</h4>
+      <p>Modo oscuro: <?= $modoOscuro ? 'Sí' : 'No' ?></p>
+      <p>Notificaciones: <?= !empty($usuario['notificaciones']) ? 'Sí' : 'No' ?></p>
+      <p>Color principal: <span class="color-chip" style="background: <?= htmlspecialchars($colorPrincipal) ?>"></span></p>
+    </div>
+    <div class="card">
+      <h4>Metas</h4>
+      <p>Activas: <?= (int)$stats['activas'] ?></p>
+      <p>Completadas: <?= (int)$stats['completadas'] ?></p>
+      <a style="color: white" href="mis_metas.php">Ver mis metas</a>
+    </div>
+    <div class="card">
+      <h4>Cuenta</h4>
+      <p>Email: <?//= htmlspecialchars($usuario['email']) ?> Y a ti que te importa</p>
+      <a style="color: white" href="ajustes.php">Ajustes</a>
+    </div>
+  </div>
 
-
-
-
-
-
-
-
-
-
-
-
+  <div class="card" style="margin-top:20px">
+    <h4>Logros recientes</h4>
+    <?php if (count($logros)): ?>
+      <div class="logros">
+        <?php foreach ($logros as $lg): ?>
+          <div class="logro">
+            <img src="<?= htmlspecialchars($lg['icono'] ?: 'public/img/logro.png') ?>" alt="" width="36" height="36">
+            <small><strong><?= htmlspecialchars($lg['nombre']) ?></strong></small>
+            <small><?= date('d/m', strtotime($lg['fecha_desbloqueo'])) ?></small>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    <?php else: ?>
+      <p>Aún no has desbloqueado logros. ¡Completa metas para conseguirlos!</p>
+    <?php endif; ?>
+  </div>
+</div>
+</div>
 
 </body>
-
 </html>

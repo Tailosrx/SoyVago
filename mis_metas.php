@@ -103,7 +103,7 @@ $metas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </a>
                         </li>
                         <li class="sidebar__item">
-                            <a class="sidebar__link" href="#" data-tooltip="Mis Metas">
+                            <a class="sidebar__link" href="logros.php" data-tooltip="Mis Metas">
                                 <span class="icon">
                                     <svg width="16" height="16" fill="currentColor" class="bi bi-trophy"
                                         viewBox="0 0 16 16">
@@ -129,7 +129,7 @@ $metas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </ul>
                     <hr>
                     <ul class="sidebar__list list--secondary">
-                        <li class="sidebar__item"> <a class="sidebar__link" href="#" data-tooltip="Profile"> <span
+                        <li class="sidebar__item"> <a class="sidebar__link" href="account.php" data-tooltip="Profile"> <span
                                     class="icon"> <svg width="16" height="16" fill="currentColor"
                                         class="bi bi-person-circle" viewBox="0 0 16 16">
                                         <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
